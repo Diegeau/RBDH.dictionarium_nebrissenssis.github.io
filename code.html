@@ -1,0 +1,89 @@
+<script>
+                var glossary1 = {}; /* Objeto para almacenar los términos del glosario*/
+
+                /* Función para cargar el archivo CSV y procesar los datos del glosario*/
+                function loadCSV1() {
+                    var xhr = new XMLHttpRequest();
+                    var csvURL = "https://raw.githubusercontent.com/Diegeau/RBDH.dictionarium_nebrissenssis.github.io/main/Data1492.csv";
+
+                    xhr.open("GET", csvURL, true);
+
+                    xhr.onload = function () {
+                        if (xhr.readyState === 4 && xhr.status === 200) {
+                            var contents = xhr.responseText;
+                            processCSV1(contents);
+                        }
+                    };
+
+                    xhr.send();
+                }
+
+                /* Función para leer el contenido del archivo CSV*/
+                function processCSV1(contents) {
+                    var lines = contents.split("\n");
+
+                    for (var i = 1; i < lines.length; i++) {
+                        var line = lines[i].trim();
+
+                        if (line !== "") {
+                            var parts = line.split(",");
+                            var term = parts[0].trim();
+                            var description = parts[1].trim();
+
+                            if (term !== "" && description !== "") {
+                                var firstLetter = term[0].toUpperCase();
+
+                                if (!glossary1[firstLetter]) {
+                                    glossary1[firstLetter] = [];
+                                }
+
+                                glossary1[firstLetter].push({
+                                    "term": term,
+                                    "description": description
+                                });
+                            }
+                        }
+                    }
+
+                    updateResults1();
+                }
+
+                var searchBar1 = document.getElementById("search-bar1");
+                searchBar1.addEventListener("input", updateResults1);
+
+                function updateResults1() {
+                    var searchTerm = searchBar1.value.toUpperCase();
+                    var resultsContainer = document.getElementById("results-container1");
+                    resultsContainer.innerHTML = "";
+
+                    if (searchTerm !== "") {
+                        for (var letter in glossary1) {
+                            var terms = glossary1[letter];
+
+                            for (var i = 0; i < terms.length; i++) {
+                                var term = terms[i].term.toUpperCase();
+                                var description = terms[i].description.toUpperCase();
+
+                                if (term.includes(searchTerm) || description.includes(searchTerm)) {
+                                    var resultItem = document.createElement("div");
+                                    var termElement = document.createElement("dt");
+                                    var descriptionElement = document.createElement("dd");
+
+                                    termElement.innerHTML = "<strong>" + terms[i].term + "</strong>";
+                                    descriptionElement.textContent = terms[i].description;
+
+                                    resultItem.appendChild(termElement);
+                                    resultItem.appendChild(descriptionElement);
+                                    resultsContainer.appendChild(resultItem);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                /* Cargar el archivo CSV al cargar la página desde mi GitHub */
+                window.addEventListener("DOMContentLoaded", function () {
+                    loadCSV1();
+                });
+            </script>
+            
